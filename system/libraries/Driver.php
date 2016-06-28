@@ -2,26 +2,37 @@
 /**
  * CodeIgniter
  *
- * An open source application development framework for PHP 5.2.4 or newer
+ * An open source application development framework for PHP
  *
- * NOTICE OF LICENSE
+ * This content is released under the MIT License (MIT)
  *
- * Licensed under the Open Software License version 3.0
+ * Copyright (c) 2014 - 2016, British Columbia Institute of Technology
  *
- * This source file is subject to the Open Software License (OSL 3.0) that is
- * bundled with this package in the files license.txt / license.rst.  It is
- * also available through the world wide web at this URL:
- * http://opensource.org/licenses/OSL-3.0
- * If you did not receive a copy of the license and are unable to obtain it
- * through the world wide web, please send an email to
- * licensing@ellislab.com so we can send you a copy immediately.
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
  *
- * @package		CodeIgniter
- * @author		EllisLab Dev Team
- * @copyright	Copyright (c) 2006 - 2013, EllisLab, Inc. (http://ellislab.com/)
- * @license		http://opensource.org/licenses/OSL-3.0 Open Software License (OSL 3.0)
- * @link		http://codeigniter.com
- * @since		Version 1.0
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @package	CodeIgniter
+ * @author	EllisLab Dev Team
+ * @copyright	Copyright (c) 2008 - 2014, EllisLab, Inc. (https://ellislab.com/)
+ * @copyright	Copyright (c) 2014 - 2016, British Columbia Institute of Technology (http://bcit.ca/)
+ * @license	http://opensource.org/licenses/MIT	MIT License
+ * @link	https://codeigniter.com
+ * @since	Version 1.0.0
  * @filesource
  */
 defined('BASEPATH') OR exit('No direct script access allowed');
@@ -80,8 +91,7 @@ class CI_Driver_Library {
 	public function load_driver($child)
 	{
 		// Get CodeIgniter instance and subclass prefix
-		$CI = get_instance();
-		$prefix = (string) $CI->config->item('subclass_prefix');
+		$prefix = config_item('subclass_prefix');
 
 		if ( ! isset($this->lib_name))
 		{
@@ -102,11 +112,12 @@ class CI_Driver_Library {
 		}
 
 		// Get package paths and filename case variations to search
+		$CI = get_instance();
 		$paths = $CI->load->get_package_paths(TRUE);
 
 		// Is there an extension?
 		$class_name = $prefix.$child_name;
-		$found = class_exists($class_name);
+		$found = class_exists($class_name, FALSE);
 		if ( ! $found)
 		{
 			// Check for subclass file
@@ -126,8 +137,8 @@ class CI_Driver_Library {
 					}
 
 					// Include both sources and mark found
-					include($basepath);
-					include($file);
+					include_once($basepath);
+					include_once($file);
 					$found = TRUE;
 					break;
 				}
@@ -139,8 +150,7 @@ class CI_Driver_Library {
 		{
 			// Use standard class name
 			$class_name = 'CI_'.$child_name;
-			$found = class_exists($class_name);
-			if ( ! $found)
+			if ( ! class_exists($class_name, FALSE))
 			{
 				// Check package paths
 				foreach ($paths as $path)
@@ -150,7 +160,7 @@ class CI_Driver_Library {
 					if (file_exists($file))
 					{
 						// Include source
-						include($file);
+						include_once($file);
 						break;
 					}
 				}
@@ -158,9 +168,9 @@ class CI_Driver_Library {
 		}
 
 		// Did we finally find the class?
-		if ( ! class_exists($class_name))
+		if ( ! class_exists($class_name, FALSE))
 		{
-			if (class_exists($child_name))
+			if (class_exists($child_name, FALSE))
 			{
 				$class_name = $child_name;
 			}
@@ -289,9 +299,7 @@ class CI_Driver {
 			return call_user_func_array(array($this->_parent, $method), $args);
 		}
 
-		$trace = debug_backtrace();
-		_exception_handler(E_ERROR, "No such method '{$method}'", $trace[1]['file'], $trace[1]['line']);
-		exit;
+		throw new BadMethodCallException('No such method: '.$method.'()');
 	}
 
 	// --------------------------------------------------------------------
@@ -332,6 +340,3 @@ class CI_Driver {
 	}
 
 }
-
-/* End of file Driver.php */
-/* Location: ./system/libraries/Driver.php */

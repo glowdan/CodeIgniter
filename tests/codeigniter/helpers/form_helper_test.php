@@ -58,7 +58,7 @@ EOH;
 	public function test_form_upload()
 	{
 		$expected = <<<EOH
-<input type="file" name="attachment" value=""  />
+<input type="file" name="attachment"  />
 
 EOH;
 
@@ -288,5 +288,3 @@ EOH;
 	}
 
 }
-
-/* End of file form_helper_test.php */
